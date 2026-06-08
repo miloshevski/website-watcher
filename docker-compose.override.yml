@@ -1,0 +1,30 @@
+version: "3.9"
+
+# Local dev overrides — applied automatically when running docker compose up
+# Hot reload for worker and frontend; backend uses create DDL for a clean DB on each rebuild.
+
+services:
+  backend:
+    environment:
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+  worker:
+    build:
+      context: ./worker
+    volumes:
+      - ./worker/src:/app/src
+    command: ["npm", "run", "dev"]
+
+  frontend:
+    build:
+      context: ./frontend
+    volumes:
+      - ./frontend/app:/app/app
+      - ./frontend/components:/app/components
+      - ./frontend/lib:/app/lib
+      - ./frontend/public:/app/public
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    command: ["npm", "run", "dev"]
+    ports:
+      - "3000:3000"

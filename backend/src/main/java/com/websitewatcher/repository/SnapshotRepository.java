@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface SnapshotRepository extends JpaRepository<Snapshot, UUID> {
     Optional<Snapshot> findTopByWatchedUrlIdOrderByCapturedAtDesc(UUID watchedUrlId);
+    void deleteByWatchedUrlId(UUID watchedUrlId);
 }

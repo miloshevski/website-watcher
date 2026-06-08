@@ -4,8 +4,11 @@ import com.websitewatcher.dto.WatchedUrlRequest;
 import com.websitewatcher.dto.WatchedUrlResponse;
 import com.websitewatcher.entity.User;
 import com.websitewatcher.entity.WatchedUrl;
+import com.websitewatcher.repository.NotificationRepository;
+import com.websitewatcher.repository.SnapshotRepository;
 import com.websitewatcher.repository.UserRepository;
 import com.websitewatcher.repository.WatchedUrlRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ public class WatchedUrlService {
 
     private final WatchedUrlRepository watchedUrlRepository;
     private final UserRepository userRepository;
+    private final SnapshotRepository snapshotRepository;
+    private final NotificationRepository notificationRepository;
 
     public List<WatchedUrlResponse> getForUser(String email) {
         User user = findUser(email);
@@ -42,14 +47,18 @@ public class WatchedUrlService {
 
     public WatchedUrlResponse update(String email, UUID id, WatchedUrlRequest request) {
         WatchedUrl entity = findOwned(email, id);
-        if (request.label() != null) entity.setLabel(request.label());
-        if (request.selector() != null) entity.setSelector(request.selector());
+        entity.setUrl(request.url());
+        entity.setLabel(request.label());
+        entity.setSelector(request.selector());
         if (request.checkIntervalMinutes() != null) entity.setCheckIntervalMinutes(request.checkIntervalMinutes());
         return toResponse(watchedUrlRepository.save(entity));
     }
 
+    @Transactional
     public void delete(String email, UUID id) {
         WatchedUrl entity = findOwned(email, id);
+        snapshotRepository.deleteByWatchedUrlId(id);
+        notificationRepository.deleteByWatchedUrlId(id);
         watchedUrlRepository.delete(entity);
     }
 
