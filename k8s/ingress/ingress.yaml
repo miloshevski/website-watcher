@@ -3,23 +3,28 @@ kind: Ingress
 metadata:
   name: website-watcher-ingress
   namespace: website-watcher
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
     - host: website-watcher.local
       http:
         paths:
-          - path: /api(/|$)(.*)
-            pathType: ImplementationSpecific
+          - path: /api
+            pathType: Prefix
             backend:
               service:
                 name: backend
                 port:
                   number: 8080
-          - path: /()(.*)
-            pathType: ImplementationSpecific
+          - path: /internal
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8080
+          - path: /
+            pathType: Prefix
             backend:
               service:
                 name: frontend
