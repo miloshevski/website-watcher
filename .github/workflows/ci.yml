@@ -44,6 +44,8 @@ jobs:
         with:
           context: ./frontend
           push: true
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/website-watcher-frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/website-watcher-frontend:${{ github.sha }}
