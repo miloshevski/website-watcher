@@ -8,13 +8,11 @@ import com.websitewatcher.repository.NotificationRepository;
 import com.websitewatcher.repository.SnapshotRepository;
 import com.websitewatcher.repository.UserRepository;
 import com.websitewatcher.repository.WatchedUrlRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +34,7 @@ public class WatchedUrlService {
     public WatchedUrlResponse create(String email, WatchedUrlRequest request) {
         User user = findUser(email);
         WatchedUrl entity = new WatchedUrl();
-        entity.setUser(user);
+        entity.setUserId(user.getId());
         entity.setUrl(request.url());
         entity.setLabel(request.label());
         entity.setSelector(request.selector());
@@ -45,7 +43,7 @@ public class WatchedUrlService {
         return toResponse(watchedUrlRepository.save(entity));
     }
 
-    public WatchedUrlResponse update(String email, UUID id, WatchedUrlRequest request) {
+    public WatchedUrlResponse update(String email, String id, WatchedUrlRequest request) {
         WatchedUrl entity = findOwned(email, id);
         entity.setUrl(request.url());
         entity.setLabel(request.label());
@@ -54,19 +52,18 @@ public class WatchedUrlService {
         return toResponse(watchedUrlRepository.save(entity));
     }
 
-    @Transactional
-    public void delete(String email, UUID id) {
+    public void delete(String email, String id) {
         WatchedUrl entity = findOwned(email, id);
         snapshotRepository.deleteByWatchedUrlId(id);
         notificationRepository.deleteByWatchedUrlId(id);
         watchedUrlRepository.delete(entity);
     }
 
-    private WatchedUrl findOwned(String email, UUID id) {
+    private WatchedUrl findOwned(String email, String id) {
         User user = findUser(email);
         WatchedUrl entity = watchedUrlRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("WatchedUrl not found"));
-        if (!entity.getUser().getId().equals(user.getId())) {
+        if (!entity.getUserId().equals(user.getId())) {
             throw new IllegalArgumentException("Access denied");
         }
         return entity;

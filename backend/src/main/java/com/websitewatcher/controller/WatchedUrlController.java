@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/watched-urls")
@@ -33,14 +32,14 @@ public class WatchedUrlController {
 
     @PutMapping("/{id}")
     public ResponseEntity<WatchedUrlResponse> update(@AuthenticationPrincipal UserDetails user,
-                                                     @PathVariable UUID id,
+                                                     @PathVariable String id,
                                                      @Valid @RequestBody WatchedUrlRequest request) {
         return ResponseEntity.ok(watchedUrlService.update(user.getUsername(), id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@AuthenticationPrincipal UserDetails user,
-                                       @PathVariable UUID id) {
+                                       @PathVariable String id) {
         watchedUrlService.delete(user.getUsername(), id);
         return ResponseEntity.noContent().build();
     }

@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/notifications")
@@ -26,7 +25,7 @@ public class NotificationController {
 
     @PutMapping("/{id}/seen")
     public ResponseEntity<NotificationResponse> markSeen(@AuthenticationPrincipal UserDetails user,
-                                                         @PathVariable UUID id) {
+                                                         @PathVariable String id) {
         return ResponseEntity.ok(notificationService.markSeen(user.getUsername(), id));
     }
 }

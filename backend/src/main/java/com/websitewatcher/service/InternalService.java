@@ -10,7 +10,6 @@ import com.websitewatcher.repository.SnapshotRepository;
 import com.websitewatcher.repository.WatchedUrlRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -24,8 +23,11 @@ public class InternalService {
     private final NotificationRepository notificationRepository;
 
     public List<WatchedUrlResponse> getDueUrls() {
-        return watchedUrlRepository.findDue()
+        Instant now = Instant.now();
+        return watchedUrlRepository.findByActive(true)
                 .stream()
+                .filter(w -> w.getLastCheckedAt() == null ||
+                        w.getLastCheckedAt().plusSeconds(w.getCheckIntervalMinutes() * 60L).isBefore(now))
                 .map(w -> new WatchedUrlResponse(
                         w.getId(), w.getUrl(), w.getLabel(), w.getSelector(),
                         w.getCheckIntervalMinutes(), w.getActive(),
@@ -34,7 +36,6 @@ public class InternalService {
                 .toList();
     }
 
-    @Transactional
     public void submitSnapshot(SnapshotRequest request) {
         WatchedUrl watchedUrl = watchedUrlRepository.findById(request.watchedUrlId())
                 .orElseThrow(() -> new IllegalArgumentException("WatchedUrl not found"));
@@ -43,7 +44,7 @@ public class InternalService {
         boolean changed = latest.map(s -> !s.getContentHash().equals(request.contentHash())).orElse(true);
 
         Snapshot snapshot = new Snapshot();
-        snapshot.setWatchedUrl(watchedUrl);
+        snapshot.setWatchedUrlId(watchedUrl.getId());
         snapshot.setContentHash(request.contentHash());
         snapshot.setContent(request.content());
         snapshotRepository.save(snapshot);
@@ -53,8 +54,8 @@ public class InternalService {
 
         if (changed) {
             Notification notification = new Notification();
-            notification.setWatchedUrl(watchedUrl);
-            notification.setUser(watchedUrl.getUser());
+            notification.setWatchedUrlId(watchedUrl.getId());
+            notification.setUserId(watchedUrl.getUserId());
             notification.setMessage("Change detected on: " + watchedUrl.getLabel());
             notification.setSeen(false);
             notificationRepository.save(notification);

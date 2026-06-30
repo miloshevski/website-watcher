@@ -1,13 +1,12 @@
 package com.websitewatcher.repository;
 
 import com.websitewatcher.entity.Notification;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
-import java.util.UUID;
 
-public interface NotificationRepository extends JpaRepository<Notification, UUID> {
-    List<Notification> findByUserId(UUID userId);
-    List<Notification> findByUserIdAndSeen(UUID userId, Boolean seen);
-    void deleteByWatchedUrlId(UUID watchedUrlId);
+public interface NotificationRepository extends MongoRepository<Notification, String> {
+    List<Notification> findByUserId(String userId);
+    List<Notification> findByUserIdAndSeen(String userId, Boolean seen);
+    void deleteByWatchedUrlId(String watchedUrlId);
 }

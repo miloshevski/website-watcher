@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +25,11 @@ public class NotificationService {
         return notifications.stream().map(this::toResponse).toList();
     }
 
-    public NotificationResponse markSeen(String email, UUID id) {
+    public NotificationResponse markSeen(String email, String id) {
         User user = findUser(email);
         var notification = notificationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
-        if (!notification.getUser().getId().equals(user.getId())) {
+        if (!notification.getUserId().equals(user.getId())) {
             throw new IllegalArgumentException("Access denied");
         }
         notification.setSeen(true);
@@ -44,7 +43,7 @@ public class NotificationService {
 
     private NotificationResponse toResponse(com.websitewatcher.entity.Notification n) {
         return new NotificationResponse(
-                n.getId(), n.getWatchedUrl().getId(),
+                n.getId(), n.getWatchedUrlId(),
                 n.getMessage(), n.getSeen(), n.getCreatedAt()
         );
     }

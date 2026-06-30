@@ -1,10 +1,9 @@
 package com.websitewatcher.dto;
 
 import java.time.Instant;
-import java.util.UUID;
 
 public record WatchedUrlResponse(
-        UUID id,
+        String id,
         String url,
         String label,
         String selector,

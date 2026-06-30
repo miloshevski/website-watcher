@@ -1,16 +1,15 @@
 package com.websitewatcher.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
-import java.util.UUID;
 
-@Entity
-@Table(name = "notifications")
+@Document(collection = "notifications")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,23 +17,15 @@ import java.util.UUID;
 public class Notification {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "watched_url_id", nullable = false)
-    private WatchedUrl watchedUrl;
+    private String watchedUrlId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private String userId;
 
-    @Column(nullable = false)
     private String message;
 
-    @Column(nullable = false)
     private Boolean seen = false;
 
-    @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 }

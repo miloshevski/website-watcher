@@ -1,12 +1,11 @@
 package com.websitewatcher.repository;
 
 import com.websitewatcher.entity.Snapshot;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
-import java.util.UUID;
 
-public interface SnapshotRepository extends JpaRepository<Snapshot, UUID> {
-    Optional<Snapshot> findTopByWatchedUrlIdOrderByCapturedAtDesc(UUID watchedUrlId);
-    void deleteByWatchedUrlId(UUID watchedUrlId);
+public interface SnapshotRepository extends MongoRepository<Snapshot, String> {
+    Optional<Snapshot> findTopByWatchedUrlIdOrderByCapturedAtDesc(String watchedUrlId);
+    void deleteByWatchedUrlId(String watchedUrlId);
 }

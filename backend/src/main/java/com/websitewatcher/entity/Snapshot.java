@@ -1,16 +1,15 @@
 package com.websitewatcher.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
-import java.util.UUID;
 
-@Entity
-@Table(name = "snapshots")
+@Document(collection = "snapshots")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,19 +17,13 @@ import java.util.UUID;
 public class Snapshot {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "watched_url_id", nullable = false)
-    private WatchedUrl watchedUrl;
+    private String watchedUrlId;
 
-    @Column(nullable = false)
     private String contentHash;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(nullable = false, updatable = false)
     private Instant capturedAt = Instant.now();
 }

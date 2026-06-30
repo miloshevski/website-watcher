@@ -4,5 +4,4 @@ metadata:
   name: backend-config
   namespace: website-watcher
 data:
-  DATABASE_URL: jdbc:postgresql://postgres:5432/website_watcher
-  POSTGRES_USER: watcher
+  MONGODB_URI: mongodb://mongodb:27017/website_watcher
